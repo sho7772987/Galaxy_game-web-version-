@@ -63,7 +63,7 @@
 ##  ファイル構成
 
 ```
-Galaxy.html
+index.html
 script.js
 style.css
 image/
