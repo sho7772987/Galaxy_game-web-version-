@@ -125,7 +125,7 @@ function main() {
         text(WIDTH * 0.5, HEIGHT * 0.3, "GALAXY DEFENDER", 60, "cyan");
 
         if (timer % 30 < 15) {
-            text(WIDTH * 0.5, HEIGHT * 0.6, "Clock to start!", 30, "lime");
+            text(WIDTH * 0.5, HEIGHT * 0.6, "Click to start!", 30, "lime");
         }
 
         if (fire == true) {
@@ -221,7 +221,7 @@ if (superBonusEnemy.active == true) {
     );
 }
 
-        let speed = 100 - Math.floor(score / 500);
+        let speed = 150 - Math.floor(score / 500);
         if (speed < 20) speed = 20;
         if (timer % speed == 0) {
             for (let y = 8; y > 0; y--) {
