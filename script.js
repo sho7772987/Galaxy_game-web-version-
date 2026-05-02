@@ -31,6 +31,29 @@ let superBonusEnemy = {
     timer: 0
 };
 
+let bombEnemy = {
+    active: false,
+    x: 0,
+    y: 0,
+    vx: 0,
+    vy: 0,
+    timer: 0
+};
+
+
+let bombWave = {
+    active: false,
+    x: 0,
+    y: 0,
+    radius: 0,
+    max: 500
+};
+
+
+
+const bombInvader = new Image();
+bombInvader.src = "image/bomb.png";
+
 const bonusInvader = new Image();
 bonusInvader.src = "image/bonus.png";
 
@@ -221,6 +244,47 @@ if (superBonusEnemy.active == true) {
     );
 }
 
+if (bombEnemy.active == false) {
+
+    if (Math.random() < 0.00035) {
+        bombEnemy.active = true;
+        bombEnemy.x = Math.random() * WIDTH;
+        bombEnemy.y = Math.random() * (HEIGHT * 0.5);
+        bombEnemy.vx = Math.random() * 16 - 8;
+        bombEnemy.vy = Math.random() * 12 - 6;
+        bombEnemy.timer = 240;
+    }
+}
+
+if (bombEnemy.active == true) {
+    bombEnemy.x += bombEnemy.vx;
+    bombEnemy.y += bombEnemy.vy;
+
+    if (bombEnemy.x < 40 || bombEnemy.x > WIDTH - 40) {
+        bombEnemy.vx *= -1;
+    }
+
+    if (bombEnemy.y < 40 || bombEnemy.y > HEIGHT * 0.6) {
+        bombEnemy.vy *= -1;
+    }
+
+    bombEnemy.timer--;
+
+    if (bombEnemy.timer <= 0) {
+        bombEnemy.active = false;
+    }
+}
+
+if (bombEnemy.active == true) {
+    ctx.drawImage(
+        bombInvader,
+        bombEnemy.x - 30,
+        bombEnemy.y - 30,
+        60,
+        60
+    );
+}
+
         let speed = 150 - Math.floor(score / 500);
         if (speed < 20) speed = 20;
         if (timer % speed == 0) {
@@ -242,6 +306,32 @@ if (superBonusEnemy.active == true) {
                 }
             }
         }
+
+        if (bombWave.active == true) {
+    bombWave.radius += 20;
+
+    for (let y = 0; y < 9; y++) {
+        for (let x = 0; x < 12; x++) {
+            if (enemy[y][x] == 1) {
+                let ex = x * SIZE + SIZE / 2;
+                let ey = y * SIZE + SIZE / 2;
+
+                let dx = ex - bombWave.x;
+                let dy = ey - bombWave.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < bombWave.radius) {
+                    enemy[y][x] = 0;
+                    score += 100;
+                }
+            }
+        }
+    }
+
+    if (bombWave.radius > bombWave.max) {
+        bombWave.active = false;
+    }
+}
 
         if (fire == true) {
             laser = {
@@ -286,6 +376,29 @@ if (superBonusEnemy.active == true) {
         effect(superBonusEnemy.x - 30, superBonusEnemy.y - 30);
         superBonusEnemy.active = false;
         score += 1000;
+    }
+}
+
+if (bombEnemy.active == true) {
+    let dx = cl_x - bombEnemy.x;
+    let dy = cl_y - bombEnemy.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < 35) {
+        effect(bombEnemy.x - SIZE / 2, bombEnemy.y - SIZE / 2);
+
+        bombEnemy.active = false;
+        bombWave.active = true;
+        bombWave.x = bombEnemy.x;
+        bombWave.y = bombEnemy.y;
+        bombWave.radius = 0;
+
+        for (let i = 0; i < 8; i++) {
+            effect(
+                bombEnemy.x - SIZE / 2 + Math.random() * 160 - 80,
+                bombEnemy.y - SIZE / 2 + Math.random() * 160 - 80
+            );
+        }
     }
 }
         }
@@ -333,6 +446,22 @@ if (superBonusEnemy.active == true) {
         }
     }
 
+if (bombWave.active == true) {
+    ctx.strokeStyle = "orange";
+    ctx.lineWidth = 8;
+
+    ctx.beginPath();
+    ctx.arc(
+        bombWave.x,
+        bombWave.y,
+        bombWave.radius,
+        0,
+        Math.PI * 2
+    );
+    ctx.stroke();
+}
+
+
     if (scene == "ゲームオーバー") {
         text(WIDTH * 0.5, HEIGHT * 0.4, "GAME OVER", 60, "red");
 
@@ -351,10 +480,12 @@ cvs.addEventListener("click", click);
 let loaded = 0;
 function checkLoad() {
     loaded++;
-    if (loaded == 5) {
+    if (loaded == 6) {
         main();
     }
 }
+
+bombInvader.onload = checkLoad;
 bonusInvader.onload = checkLoad;
 superBonusInvader.onload = checkLoad;
 bg.onload = checkLoad;
